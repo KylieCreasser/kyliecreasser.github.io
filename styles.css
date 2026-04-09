@@ -340,19 +340,19 @@ body.menu-open .menu-btn {
   
   /* ---------- HOME HERO (text on background) ---------- */
   .home-hero{
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 160px 28px 90px;
-    text-align: left;
-  }
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 120px 28px 40px;
+  text-align: left;
+}
   
   .home-title{
-    font-family: var(--serif, "Fraunces", serif);
-    font-size: clamp(52px, 7vw, 86px);
-    letter-spacing: -0.03em;
-    margin: 0 0 10px 0;
-    color: rgba(0,0,0,0.88);
-  }
+  font-family: var(--serif, "Fraunces", serif);
+  font-size: clamp(44px, 6vw, 76px);
+  letter-spacing: -0.03em;
+  margin: 0 0 10px 0;
+  color: rgba(0,0,0,0.88);
+}
   
   .home-subtitle{
     margin: 0 0 26px 0;
@@ -362,9 +362,10 @@ body.menu-open .menu-btn {
   }
   
   .home-actions{
-    display: flex;
-    gap: 14px;
-  }
+  display: flex;
+  gap: 14px;
+  margin-top: 10px;
+}
   
   .home-btn{
     display: inline-block;
@@ -400,8 +401,10 @@ body.menu-open .menu-btn {
 
  .portfolio-hero h1 {
   font-size: 72px;
-  margin-bottom: 10px;
-  
+  margin: 0 auto 10px;
+  display: inline-block;
+  width: fit-content;
+  color: transparent;
 
   background: linear-gradient(
     90deg,
@@ -1621,3 +1624,30 @@ body.page-exit {
   );
   opacity: 0.6;
 }
+
+.connect-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 100px 20px 80px;
+}
+
+.connect-buttons {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.build-credit {
+  margin-top: 32px;
+  font-size: 0.95rem;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.heart {
+  color: hotpink;
+}
+
