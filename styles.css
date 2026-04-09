@@ -1160,11 +1160,8 @@ body.menu-open .linkedin-btn {
   opacity: 0;
   pointer-events: none;
 }
-.connect-section {
-  border-top: 1px solid rgba(0,0,0,0.06);
-}
-/* --- SUBTLE PAGE REVEAL --- */
 
+/* --- SUBTLE PAGE REVEAL --- */
 .fade-up {
   opacity: 0;
   transform: translateY(18px);
