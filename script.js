@@ -13,7 +13,7 @@ if (openBtn && closeBtn && overlay) {
     document.body.classList.remove("menu-open");
   });
 
-  document.querySelectorAll(".menu-link").forEach(link => {
+  document.querySelectorAll(".menu-link").forEach((link) => {
     link.addEventListener("click", () => {
       overlay.classList.remove("open");
       document.body.classList.remove("menu-open");
@@ -21,170 +21,25 @@ if (openBtn && closeBtn && overlay) {
   });
 }
 
-// ----- Interactive ripple canvas (Home only) -----
-const canvas = document.getElementById("bgCanvas");
-
-
-if (canvas) {
-  const ctx = canvas.getContext("2d");
-
-  // Resize for crisp rendering
-  function resize() {
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.floor(window.innerWidth * dpr);
-    canvas.height = Math.floor(window.innerHeight * dpr);
-    canvas.style.width = window.innerWidth + "px";
-    canvas.style.height = window.innerHeight + "px";
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-  window.addEventListener("resize", resize);
-  resize();
-
-  // Ripple simulation on a coarse grid (fast)
-  const scale = 3; // smaller = more detailed but heavier. 3 is a good start.
-  let w = Math.floor(window.innerWidth / scale);
-  let h = Math.floor(window.innerHeight / scale);
-
-  let prev = new Float32Array(w * h);
-  let curr = new Float32Array(w * h);
-
-  function resetGrid() {
-    w = Math.floor(window.innerWidth / scale);
-    h = Math.floor(window.innerHeight / scale);
-    prev = new Float32Array(w * h);
-    curr = new Float32Array(w * h);
-  }
-  window.addEventListener("resize", resetGrid);
-
-  // “Ink” palette behind ripples
-  const colors = [
-    [255, 42, 127], // pink
-    [255, 122, 61], // coral
-    [24, 198, 193], // teal
-    [245, 66, 145], // magenta
-  ];
-
-  // Add disturbance where mouse moves (this is the "push")
-  function splash(clientX, clientY, strength = 120) {
-    const x = Math.floor((clientX / window.innerWidth) * w);
-    const y = Math.floor((clientY / window.innerHeight) * h);
-
-    const r = 6; // radius of disturbance
-    for (let dy = -r; dy <= r; dy++) {
-      for (let dx = -r; dx <= r; dx++) {
-        const nx = x + dx;
-        const ny = y + dy;
-        if (nx < 1 || ny < 1 || nx >= w - 1 || ny >= h - 1) continue;
-        const d = dx * dx + dy * dy;
-        if (d <= r * r) {
-          prev[ny * w + nx] -= strength * (1 - d / (r * r));
-        }
-      }
-    }
-  }
-
-  // Mouse “drag” makes continuous ripples
-  let lastMove = 0;
-  window.addEventListener("mousemove", (e) => {
-    const now = performance.now();
-    if (now - lastMove > 12) { // throttle
-      splash(e.clientX, e.clientY, 90);
-      lastMove = now;
-    }
-  });
-
-  // Click makes a bigger splash (fun)
-  window.addEventListener("click", (e) => splash(e.clientX, e.clientY, 220));
-
-  // Render: map ripple height to slight color shifts (watery shimmer)
-  function draw(time) {
-    // ripple update (simple wave equation)
-    const damping = 0.985;
-
-    for (let y = 1; y < h - 1; y++) {
-      for (let x = 1; x < w - 1; x++) {
-        const i = y * w + x;
-        const v =
-          (prev[i - 1] + prev[i + 1] + prev[i - w] + prev[i + w]) / 2 - curr[i];
-        curr[i] = v * damping;
-      }
-    }
-
-    // paint background gradient-ish + ripple shimmer
-    const imgW = window.innerWidth;
-    const imgH = window.innerHeight;
-
-    // base fill
-    ctx.clearRect(0, 0, imgW, imgH);
-
-    // soft blobs (static-ish) so your colors match
-    // (cheap radial fills)
-    function blob(cx, cy, r, rgb, a) {
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      g.addColorStop(0, `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`);
-      g.addColorStop(1, `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0)`);
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    blob(imgW * 0.25, imgH * 0.30, 520, colors[0], 0.75);
-    blob(imgW * 0.78, imgH * 0.38, 560, colors[1], 0.70);
-    blob(imgW * 0.42, imgH * 0.78, 620, colors[2], 0.65);
-    blob(imgW * 0.72, imgH * 0.78, 540, colors[3], 0.55);
-
-    // ripple shimmer overlay
-    // draw coarse grid as small rectangles — fast enough
-    ctx.globalCompositeOperation = "soft-light";
-    for (let y = 0; y < h; y += 2) {
-      for (let x = 0; x < w; x += 2) {
-        const i = y * w + x;
-        const val = curr[i]; // -inf..inf
-        const intensity = Math.max(0, Math.min(1, (val + 60) / 120));
-
-        if (intensity < 0.52) continue; // skip low energy pixels
-
-        // white shimmer
-        ctx.fillStyle = `rgba(255,255,255,${(intensity - 0.5) * 0.18})`;
-        ctx.fillRect(x * scale, y * scale, scale * 2, scale * 2);
-      }
-    }
-    ctx.globalCompositeOperation = "source-over";
-
-    // swap buffers
-    const tmp = prev;
-    prev = curr;
-    curr = tmp;
-
-    requestAnimationFrame(draw);
-  }
-
-  requestAnimationFrame(draw);
-}
-
-
 document.querySelectorAll(".reel-video").forEach((vid) => {
-    vid.addEventListener("mouseenter", () => {
-      vid.currentTime = 0;
-      vid.play().catch(()=>{});
-    });
-  
-    vid.addEventListener("mouseleave", () => {
-      vid.pause();
-      vid.currentTime = 0;
-    });
+  vid.addEventListener("mouseenter", () => {
+    vid.currentTime = 0;
+    vid.play().catch(() => {});
   });
-// --- PAGE TRANSITIONS ---
+
+  vid.addEventListener("mouseleave", () => {
+    vid.pause();
+    vid.currentTime = 0;
+  });
+});
 
 window.addEventListener("load", () => {
   document.body.classList.add("page-loaded");
 });
 
-document.querySelectorAll("a[href]").forEach(link => {
+document.querySelectorAll("a[href]").forEach((link) => {
   const url = link.getAttribute("href");
 
-  // only apply to internal links
   if (
     url &&
     !url.startsWith("#") &&
@@ -203,3 +58,91 @@ document.querySelectorAll("a[href]").forEach(link => {
     });
   }
 });
+
+// ===== SIMPLE WEBGL BACKGROUND =====
+const webglCanvas = document.getElementById("webgl");
+
+if (webglCanvas && window.innerWidth > 768 && window.THREE) {
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas: webglCanvas,
+    alpha: true,
+    antialias: true
+  });
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+
+  const geometry = new THREE.PlaneGeometry(2, 2);
+
+  const uniforms = {
+    uTime: { value: 0 },
+    uResolution: {
+      value: new THREE.Vector2(window.innerWidth, window.innerHeight)
+    }
+  };
+
+  const material = new THREE.ShaderMaterial({
+    uniforms,
+    vertexShader: `
+      void main() {
+        gl_Position = vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform float uTime;
+      uniform vec2 uResolution;
+
+      void main() {
+        vec2 uv = gl_FragCoord.xy / uResolution.xy;
+        float t = uTime * 0.18;
+
+        // VIBRANT COLORS (hot pink + teal + pastel mix)
+        vec3 hotPink = vec3(1.0, 0.25, 0.65);
+        vec3 coral   = vec3(1.0, 0.55, 0.35);
+        vec3 teal    = vec3(0.15, 0.85, 0.80);
+        vec3 lilac   = vec3(0.75, 0.60, 1.0);
+        vec3 softBg  = vec3(0.97, 0.95, 0.93);
+
+        // smooth flowing motion (no harsh lines)
+        float w1 = sin((uv.x * 3.0) + t);
+        float w2 = sin((uv.y * 3.5) - t * 1.2);
+        float w3 = sin(((uv.x + uv.y) * 2.5) + t * 0.8);
+
+        float m1 = 0.5 + 0.5 * w1;
+        float m2 = 0.5 + 0.5 * w2;
+        float m3 = 0.5 + 0.5 * w3;
+
+        // layer colors more strongly (this is key)
+        vec3 color = mix(softBg, hotPink, m1 * 0.7);
+        color = mix(color, coral, m2 * 0.55);
+        color = mix(color, teal, m3 * 0.5);
+        color = mix(color, lilac, (m1 * m3) * 0.35);
+
+        // slight richness boost
+        color = pow(color, vec3(0.9));
+
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  function animate() {
+    uniforms.uTime.value += 0.01;
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+
+  window.addEventListener("resize", () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+  });
+}
